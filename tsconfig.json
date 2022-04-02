@@ -12,9 +12,10 @@
     "lib": ["esnext", "dom"],
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
-      // "/#/*": ["types/*"]
-    }
+      "@/*": ["src/*"],
+      "#/*": ["types/*"]
+    },
+    // "suppressImplicitAnyIndexErrors": true
   },
   "include": [
     "src/**/*.ts", 

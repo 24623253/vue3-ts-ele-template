@@ -32,10 +32,10 @@ export default ({ command, mode }:ConfigEnv) : UserConfig=>{
           replacement: pathResolve('src') + '/',
         },
         // /#/xxxx => types/xxxx
-        // {
-        //   find: /#\//,
-        //   replacement: pathResolve('types') + '/',
-        // },
+        {
+          find: /#\//,
+          replacement: pathResolve('types') + '/',
+        },
       ],
     },
     server: {
@@ -45,7 +45,9 @@ export default ({ command, mode }:ConfigEnv) : UserConfig=>{
       proxy: {
         // https://cn.vitejs.dev/config/#server-proxy
         '/dev-api': {
-          target: 'http://192.168.30.240:8080',
+          // target: 'http://192.168.30.201:8101',
+          target: 'http://192.168.20.16:8080',
+          
           changeOrigin: true,
           rewrite: (p) => p.replace(/^\/dev-api/, '')
         }
