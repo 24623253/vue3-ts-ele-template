@@ -5,23 +5,23 @@
 			<el-form-item prop="username" size="large">
 				<el-input v-model="loginForm.username" type="text" auto-complete="off" placeholder="账号">
 					<template #prefix>
-						<!-- <svg-icon icon-class="user" class="el-input__icon input-icon" /> -->
+						<svg-icon icon-class="user" class="el-input__icon input-icon" />
 					</template>
 				</el-input>
 			</el-form-item>
 			<el-form-item prop="password" size="large">
 				<el-input v-model="loginForm.password" type="password" auto-complete="off" placeholder="密码"
-					@keyup.enter="handleLogin">
+					@keyup.enter.native="handleLogin(ruleFormRef)">
 					<template #prefix>
-						<!-- <svg-icon icon-class="password" class="el-input__icon input-icon" /> -->
+						<svg-icon icon-class="password" class="el-input__icon input-icon" />
 					</template>
 				</el-input>
 			</el-form-item>
-			<el-form-item prop="code" v-if="captchaOnOff">
+			<el-form-item prop="code" v-if="captchaOnOff" size="large">
 				<el-input v-model="loginForm.code" auto-complete="off" placeholder="验证码" style="width: 63%"
-					@keyup.enter="handleLogin">
+					@keyup.enter.native="handleLogin(ruleFormRef)">
 					<template #prefix>
-						<!-- <svg-icon icon-class="validCode" class="el-input__icon input-icon" /> -->
+						<svg-icon icon-class="validCode" class="el-input__icon input-icon" />
 					</template>
 				</el-input>
 				<div class="login-code">
@@ -49,11 +49,13 @@ import { encrypt, decrypt } from '@/utils/jsencrypt';
 import { ref,reactive,unref } from 'vue'
 import type { FormInstance } from 'element-plus'
 import { useUserStore } from '@/store/modules/user';
+import { useRoute, useRouter } from 'vue-router'
 
+const router = useRouter();
 const ruleFormRef = ref<FormInstance>()
 const userStore = useUserStore()
 
-// console.log(userStore);
+console.log(userStore.token);
 // import { storeToRefs } from 'pinia';
 // const {testNum} = storeToRefs(userStore)
 // const nums = userStore.getTestNum
@@ -65,7 +67,8 @@ const userStore = useUserStore()
 
 const loginForm= ref<any>({
   username: 'admin',
-	password: 'ASDqwe123',
+	// password: 'ASDqwe123',
+	password: 'admin123',
 	rememberMe: false,
 	code: '',
 	uuid: '',
@@ -108,9 +111,15 @@ const handleLogin = async (formEl: FormInstance | undefined) => {
 				Cookies.remove('rememberMe');
 			}
 			// 调用action的登录方法
-			userStore.login(loginForm.value).then(()=>{
-				console.log('-------------userStore.login')
-			})
+			userStore.login(loginForm.value).then(() => {
+				router.push({ path: redirect.value || '/index' });
+			}).catch(() => {
+					loading.value = false;
+					// 重新获取验证码
+					if (captchaOnOff.value) {
+						getCode();
+					}
+			});
 			// store.dispatch('Login', loginForm.value)
 			// 	.then(() => {
 			// 		router.push({ path: redirect.value || '/' });
@@ -131,7 +140,6 @@ const handleLogin = async (formEl: FormInstance | undefined) => {
 
 const getCode = async()=>{
 	await getCodeImg({id:222}).then(async(res)=>{
-		console.log(res);
 		captchaOnOff.value = res.captchaOnOff === undefined ? true : res.captchaOnOff;
 		if (captchaOnOff.value) {
 			codeUrl.value = 'data:image/gif;base64,' + res.img;
@@ -149,7 +157,6 @@ function getCookie() {
 		password:	password === undefined ? loginForm.value.password : decrypt(password),
 		rememberMe: rememberMe === undefined ? false : Boolean(rememberMe),
 	};
-	console.log(loginForm.value,username,password,rememberMe)
 }
 // const getCode = ()=>{
 // 	getCodeImg({id:222}).then((res)=>{
@@ -198,7 +205,7 @@ getCookie()
 	color: #bfbfbf;
 }
 .login-code {
-	width: 33%;
+	margin-left: 15px;
 	height: 38px;
 	float: right;
 	img {

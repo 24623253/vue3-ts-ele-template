@@ -1,5 +1,5 @@
 import { createWebHistory, createRouter, RouteRecordRaw } from 'vue-router'
-// import Layout from '@/layout/index.vue'
+import Layout from '@/layout/index.vue'
 
 /**
  * Note: 路由配置项
@@ -23,21 +23,54 @@ import { createWebHistory, createRouter, RouteRecordRaw } from 'vue-router'
 
 export const constantRoutes: Array<RouteRecordRaw> = [
   {
+    path: '/redirect',
+    component: Layout,
+    hidden: true,
+    children: [
+      {
+        path: '/redirect/:path(.*)*',
+        component: () => import('@/views/redirect/index.vue')
+      }
+    ]
+  },
+  {
     path: '/login',
     component: () => import('@/views/login/index.vue'),
     hidden: true
   },
-  // {
-  //   path: '/redirect',
-  //   component: Layout,
-  //   hidden: true,
-  //   children: [
-  //     {
-  //       path: '/redirect/:path(.*)',
-  //       component: () => import('@/views/redirect/index.vue')
-  //     }
-  //   ]
-  // },
+  {
+    path: '',
+    component: Layout,
+    redirect: '/index',
+    children: [
+      {
+        path: '/index',
+        component: () => import('@/views/index.vue'),
+        name: 'Index',
+        meta: { title: '首页', icon: 'dashboard', affix: true }
+      }
+    ]
+  },
+  {
+    path: '/user',
+    component: Layout,
+    hidden: true,
+    redirect: 'noredirect',
+    children: [
+      {
+        path: 'profile',
+        component: () => import('@/views/system/user/profile/index.vue'),
+        name: 'Profile',
+        meta: { title: '个人中心', icon: 'user' }
+      }
+    ]
+  },
+  {
+    path: '/temp',
+    component: () => import('@/views/temp/index.vue'),
+    hidden: true
+  },
+  
 ]
 
 const router = createRouter({

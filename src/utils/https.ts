@@ -48,11 +48,10 @@ service.interceptors.request.use((config:Partial<AxiosRequestConfig>) => {
   // const isToken = (config.headers || {}).isToken === false
   type isTokenType = Boolean | null | String | undefined
   const isToken:isTokenType  = (config.headers||{}).isToken === undefined
-  console.log(isToken)
   // 是否需要防止数据重复提交
   // const isRepeatSubmit = (config.headers || {}).repeatSubmit === false
   const isRepeatSubmit = (config.headers || {}).repeatSubmit === false
-  console.log(isRepeatSubmit,'<><<<')
+  
   if (getToken() && isToken) {
     config.headers!['Authorization'] = 'Bearer ' + getToken() // 让每个请求携带自定义token 请根据实际情况自行修改
   }

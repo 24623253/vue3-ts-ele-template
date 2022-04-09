@@ -10,7 +10,8 @@ import vue from '@vitejs/plugin-vue'
 import type { UserConfig, ConfigEnv } from 'vite'
 import  { loadEnv } from 'vite'
 import { resolve } from 'path';
-import { createVitePlugins } from './vite/plugin';
+import createVitePlugins from './vite/plugin';
+console.log(createVitePlugins);
 
 
 function pathResolve(dir: string) {
@@ -22,6 +23,7 @@ export default ({ command, mode }:ConfigEnv) : UserConfig=>{
   const root = process.cwd();
   const env = loadEnv(mode, root)
   return {
+    plugins: createVitePlugins(env, command === 'build'),
     base: '/',
     root,
     resolve:{
@@ -37,6 +39,7 @@ export default ({ command, mode }:ConfigEnv) : UserConfig=>{
           replacement: pathResolve('types') + '/',
         },
       ],
+      extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json', '.vue']  // 省略后缀
     },
     server: {
       port: 9527,
@@ -46,15 +49,14 @@ export default ({ command, mode }:ConfigEnv) : UserConfig=>{
         // https://cn.vitejs.dev/config/#server-proxy
         '/dev-api': {
           // target: 'http://192.168.30.201:8101',
-          target: 'http://192.168.20.16:8080',
-          
+          target: 'http://192.168.20.16:8080', // 徐超
+          // target: 'http://192.168.30.67:8101', //卜嵇成
           changeOrigin: true,
           rewrite: (p) => p.replace(/^\/dev-api/, '')
         }
       },
-    },
+    }
     // The vite plugin used by the project. The quantity is large, so it is separately extracted and managed
     // plugins: createVitePlugins(viteEnv, isBuild),
-    plugins: createVitePlugins(env, command === 'build'),
   }
 }

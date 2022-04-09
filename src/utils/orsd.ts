@@ -220,7 +220,7 @@ export function tansParams(params:ParamsType) {
 
 
 // 返回项目路径
-export function getNormalPath(p) {
+export function getNormalPath(p: string) {
   if (p.length === 0 || !p || p == 'undefined') {
     return p
   };

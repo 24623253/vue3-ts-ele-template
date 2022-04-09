@@ -25,6 +25,7 @@
   },
   "devDependencies": {
     "@types/js-cookie": "^3.0.1",
+    "@types/nprogress": "^0.2.0",
     "@vitejs/plugin-vue": "^2.2.0",
     "@vue/compiler-sfc": "3.2.22",
     "sass": "1.45.0",

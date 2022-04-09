@@ -5,7 +5,14 @@ import { store } from '@/store'
 import { login, logout, getInfo } from '@/api/user/login'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import defAva from '@/assets/images/profile.jpg'
-
+import { Fn } from '@vueuse/core';
+const menuManager: {
+  domList: Element[];
+  resolve: Fn;
+} = {
+  domList: [],
+  resolve: () => {},
+};
 interface UserState {
   // userInfo: Nullable<UserInfo>;
   // userInfo?: object | null;
@@ -16,7 +23,7 @@ interface UserState {
   token?: string
   name?: string
   avatar?: string
-  roles: RoleEnum[]
+  roles: Array<any>
   permissions: Array<any>
   testNum: number
 }
@@ -65,36 +72,74 @@ export const useUserStore = defineStore({
     // setToken(info: string | undefined) {
     //   this.token = info ? info : ''; // for null or undefined value
     // },
+    // 登录
     login(userForm: object){
       // const username = userForm.username!.trim()
       // const password = userForm.password
       // const code = userForm.code
       // const uuid = userForm.uuid
-      return new Promise((resolve: any, reject) => {
+      return new Promise((resolve, reject) => {
         login(userForm).then(res => {
           setToken(res.token)
           // commit('SET_TOKEN', res.token)
           this.token = res.token
           console.log(this.token)
           console.log(res.token)
-          debugger
-          resolve()
+          resolve('')
         }).catch(error => {
           reject(error)
         })
       })
     },
 
+    // 获取用户信息
+    GetInfo(){
+      return new Promise((resolve, reject) => {
+        getInfo().then(res => {
+          const user = res.user
+          const avatar = user.avatar == "" ? defAva : import.meta.env.VITE_APP_BASE_API + user.avatar;
+         
+          if (res.roles && res.roles.length > 0) { // 验证返回的roles是否是一个非空数组
+            this.roles = res.roles
+            this.permissions = res.permissions
+          } else {
+            this.roles = ["ROLE_DEFAULT"]
+          }
+          this.name = res.name
+          this.avatar = avatar
+          resolve(res)
+        }).catch(error => {
+          reject(error)
+        })
+      })
+    },
+
+    // 退出系统
+    LogOut() {
+      return new Promise((resolve, reject) => {
+        // const token = this.token
+        logout().then(() => {
+          this.token = ''
+          this.roles = []
+          this.permissions = []
+          removeToken()
+          resolve('')
+        }).catch(error => {
+          reject(error)
+        })
+      })
+    },
+    
+    // 测试
     addTestNum(num: number){
       this.testNum += num
       console.log(this.testNum,num);
-      
     }
 
   }
 
 })
 
-export function useUserStoreWithOut() {
+export function useUserStoreOut() {
   return useUserStore(store);
 }
